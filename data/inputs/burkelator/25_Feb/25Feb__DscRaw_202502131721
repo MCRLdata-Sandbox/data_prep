@@ -1,0 +1,4 @@
+3 header lines
+CO2 and ancillary continuous data
+
+DOY_UTC CO2_ppm CO2_abs H2O_ppt H2Oabs Cell_T Cell_P 820pwrV TSG_T TSG_C TSG_S AI0 AI1 AI2 AI3 AI4 AI5 AI6 AI7 MFC1_pressure MFC1_Temp MFC1_vflow MFC1_mflow MFC1_SP GSelValve EqBypValve StripBypValve LSelValve DscSmplHdspcValve Date Time OperationMode

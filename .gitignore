@@ -47,3 +47,11 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+*.DS_Store
+
+data/mcrl_data/athena/*
+
+*/archive/*
+
+data/inputs/mcrl_data/MCRLdata*
