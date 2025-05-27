@@ -20,7 +20,7 @@ source("scripts/0_setup.R")
 ## We have several files downloaded as csvs directly from Athena. In an effort to
 ## make things as plug-and-play as possible, I'm going to add extra steps to ID
 ## which files are which and read them in, hopefully programmatically
-all_files <- list.files("data/mcrl_data/athena/210501_250501", 
+all_files <- list.files("data/inputs/mcrl_data/athena/210501_250501", 
                         full.names = T)
 
 what_files_do_i_have <- function(file){
@@ -101,5 +101,5 @@ df <- full_join(tidegauge %>% dplyr::select(-time_utc),
   full_join(co2 %>% dplyr::select(-time_utc), by = "time_pst") %>% 
   full_join(met %>% dplyr::select(-time_utc), by = "time_pst") 
 
-write_csv(df, "data/mcrl_data/MCRLdata_240501_250501_L0.csv")
+write_csv(df, "data/inputs/mcrl_data/MCRLdata_240501_250501_L0.csv")
 
