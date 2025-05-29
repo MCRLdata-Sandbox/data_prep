@@ -1,6 +1,6 @@
 ## Read me first!
 
-Data are stored the data_prep repo under data/outputs/
+Data are stored the *data_prep* repo under *data/outputs/*
 
 Data here have been QC'ed to either level 1 (L1) or level 2 (L2). These levels are defined below, and not interoperable with other projects' definitions
 
