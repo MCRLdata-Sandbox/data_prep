@@ -55,3 +55,5 @@ data/mcrl_data/athena/*
 */archive/*
 
 data/inputs/mcrl_data/MCRLdata*
+
+*s3_access*

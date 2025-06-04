@@ -1,0 +1,135 @@
+---
+title: "MCRLdata Athena L1 prep"
+author: "PR"
+date: "2025-05-29"
+output: html_document
+  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,
+                      message = F,
+                      warning = F)
+```
+
+## Purpose
+
+Data downloaded directly from the MCRLdata pipeline via the Athena AWS interface will be cleaned to Level 1 (L1) based solely on flagging. The only decisions being made are if there are multiple sources for a given parameter (e.g. water temperature), picking which dataset is used.
+
+L1 is defined as removing flagged data. Flags are automatically produced by the MCRLdata pipeline, and capture a variety of off-normal data behaviors. I am deciding that L1 will have these values removed, data will be harmonized to a consistent temporal increment, converted to PST, and then exported as a single flat file
+
+
+### Order of ops
+
+  1. Pull in all datasets
+  2. If multiple sources are available, compare and decide which to use
+  3. Plot L0 (all data) and L1 to understand what's being scrubbed
+  4. Clean to L1, combine, and export
+  
+
+## First look
+
+Let's look at what variables are in the files we've downloaded from Athena
+
+```{r set up environment}
+
+source("../scripts/0_setup.R")
+
+```
+
+```{r}
+# 2. Discover files ------------------------------------------------------------
+
+## We have several files downloaded as csvs directly from Athena. In an effort to
+## make things as plug-and-play as possible, I'm going to add extra steps to ID
+## which files are which and read them in, hopefully programmatically
+all_files <- list.files("../data/inputs/mcrl_data/athena/210501_250501", 
+                        full.names = T)
+
+what_files_do_i_have <- function(file){
+  headers <- read_csv(file) %>% 
+    # we aren't interested in time or qc, just data cols
+    dplyr::select(-c(contains("time"), contains("qc_"))) %>%  
+    # make things easier to read, w/ no special characters to potential cause issues
+    clean_names() 
+  
+  paste(colnames(headers), collapse = ", ")
+}
+
+file_vars <- all_files %>% 
+  map(what_files_do_i_have)
+
+file_vars
+```
+
+```{r read in files}
+
+# 3. Read in files -------------------------------------------------------------
+
+## I suspect there's a cleaner way to do this, but it's likely most efficient to
+## label files when you're downloading.
+
+## Helper function to find the string you're looking for
+which_file <- function(var_string){
+  which(sapply(file_vars, grepl, pattern = var_string))[[1]]
+}
+
+## One more helper function to clean up column names, round datetime, and convert time to PST
+read_csv_formatted <- function(file)(
+  read_csv(file) %>% 
+    clean_names() %>% 
+    mutate(time_utc = round_date(force_tz(time_utc, tzone = "UTC"), unit = "5 min")) %>% 
+    mutate(time_pst = with_tz(time_utc, tzone = "Etc/GMT+8"))# %>%  # Forcing to PST
+    # mutate(year = year(time_pst), 
+    #        quarter = quarter(time_pst, fiscal_start = 3),
+    #        month = month(time_pst), 
+    #        doy = yday(time_pst), 
+    #        hour_of_day = hour(time_pst))
+)
+
+
+## Let's read in our datasets
+cdom <- read_csv_formatted(all_files[[which_file("cdom")]]) 
+co2 <- read_csv_formatted(all_files[[which_file("p_co2")]]) 
+ctd <- read_csv_formatted(all_files[[which_file("salinity")]])
+ph <- read_csv_formatted(all_files[[which_file("temperature")]]) ## this is bad regex, need to isolate ph
+met <- read_csv_formatted(all_files[[which_file("airtemp")]])
+tidegauge <- read_csv_formatted(all_files[[which_file("water_level")]])
+
+```
+
+
+
+## Decide on data sources
+
+### Water temp
+
+Water temperature is available from the CTD and pH sensors. While there are clear issues with CTD temperatures for mid 2024 on, the pH temperature does not cover a large-enough range to be useful. 
+
+```{r}
+temp_comparison <- full_join(ph %>% 
+            filter(qc_temperature == 0) %>% 
+            rename("ph_temp" = temperature) %>% 
+            dplyr::select(time_pst, ph_temp), 
+          ctd %>% 
+            filter(qc_temp == 0) %>% 
+            rename("ctd_temp" = temp_deg_c) %>% 
+          dplyr::select(time_pst, ctd_temp), 
+          by = "time_pst")
+
+ggplot(temp_comparison, aes(ctd_temp, ph_temp)) + 
+  geom_point(alpha = 0.2) + 
+  geom_smooth(se = F)
+
+plot_grid(ggplot(temp_comparison, aes(x = time_pst)) + 
+  geom_line(aes(y = ctd_temp), color = "blue", alpha = 0.5), 
+  ggplot(temp_comparison, aes(x = time_pst)) + 
+  geom_line(aes(y = ph_temp), color = "red", alpha = 0.5), 
+  ncol = 1)
+
+# ggplot(temp_comparison, aes(x = time_pst)) + 
+#   geom_line(aes(y = ctd_temp), color = "blue", alpha = 0.3) + 
+#   geom_line(aes(y = ph_temp), color = "red", alpha = 0.5)
+```
+
+
