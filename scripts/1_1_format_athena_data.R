@@ -62,14 +62,17 @@ read_csv_formatted <- function(file)(
 
 
 ## Let's read in our datasets
+adcp <- read_csv_formatted(all_files[[which_file("velocity")]]) 
 cdom <- read_csv_formatted(all_files[[which_file("cdom")]]) 
 co2 <- read_csv_formatted(all_files[[which_file("p_co2")]]) 
 ctd <- read_csv_formatted(all_files[[which_file("salinity")]])
-ph <- read_csv_formatted(all_files[[which_file("ph")]]) ## this is bad regex, need to isolate ph
+ph <- read_csv_formatted(all_files[[which_file("temperature, ph")]]) ## this is bad regex, need to isolate ph
 met <- read_csv_formatted(all_files[[which_file("airtemp")]])
 tidegauge <- read_csv_formatted(all_files[[which_file("water_level")]])
 
 plot_grid(ggplot(tidegauge %>% filter(qc_water_level == 0), aes(time_pst, water_level_m_navd88)) + 
+            geom_line(), 
+          ggplot(adcp %>% filter(maxu_qc == 0), aes(time_pst, max_velocity_m_s)) + 
             geom_line(), 
           ggplot(ctd %>% filter(qc_salinity == 0), aes(time_pst, salinity_ppt)) + 
             geom_line(), 
@@ -91,11 +94,11 @@ duplicates_tidegauge <- tidegauge %>%
   filter(count > 1)
 
 
-
 ## Finally, merge into a single dataframe, selecting parameters we expect to be of 
 ## most interest
 df <- full_join(tidegauge %>% dplyr::select(-time_utc), 
                 ctd %>% dplyr::select(-time_utc), by = "time_pst") %>% 
+  full_join(adcp %>% dplyr::select(-time_utc), by = "time_pst") %>% 
   full_join(ph %>% dplyr::select(-time_utc), by = "time_pst") %>% 
   full_join(cdom %>% dplyr::select(-c(time_utc)), by = "time_pst") %>% 
   full_join(co2 %>% dplyr::select(-time_utc), by = "time_pst") %>% 
