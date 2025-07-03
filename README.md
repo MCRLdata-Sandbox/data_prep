@@ -1,2 +1,4 @@
 # data_prep
-A repo for data prep, including additional quality control scripts. I am keeping this repo private for now since all other repos depend in some way on this code and I don't want to risk people messing with it. For now. Not forever. But for now.
+A repo for preparing historic MCRLdata datasets, including additional quality control. This repo provides content for other repos and likely will not be useful unless you are looking for quality control scripts.
+
+🏖️ Note: If this is <ins>your first time here</ins>, or you have questions about the whys, whats, and hows, please start with the **[sandbox_intro](https://github.com/MCRLdata-Sandbox/.github/blob/main/sandbox_intro.md)**
