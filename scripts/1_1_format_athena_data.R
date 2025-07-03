@@ -113,9 +113,12 @@ l0_plot <- function(var, flag){
   
   var_name <- deparse(substitute(var))
   
-  ggplot(df, aes(time_pst, {{var}})) + 
+  x <- df %>% 
+    drop_na({{var}})
+  
+  ggplot(x, aes(time_pst, {{var}})) + 
     geom_line(color = "gray") + 
-    geom_point(data = df %>% filter({{flag}} != 0), color = "red", alpha = 0.3)
+    geom_point(data = x %>% filter({{flag}} != 0), color = "red", alpha = 0.3)
   
   ggsave(paste0("figures/L0_plots/L0_", var_name, ".png"), 
          width = 6, height = 3.5)
