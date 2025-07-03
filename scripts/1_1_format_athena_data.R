@@ -106,3 +106,51 @@ df <- full_join(tidegauge %>% dplyr::select(-time_utc),
 
 write_csv(df, "data/inputs/mcrl_data/MCRLdata_240501_250501_L0.csv")
 
+
+## Make L0 plots for parameters
+
+l0_plot <- function(var, flag){
+  
+  var_name <- deparse(substitute(var))
+  
+  ggplot(df, aes(time_pst, {{var}})) + 
+    geom_line(color = "gray") + 
+    geom_point(data = df %>% filter({{flag}} != 0), color = "red", alpha = 0.3)
+  
+  ggsave(paste0("figures/L0_plots/L0_", var_name, ".png"), 
+         width = 6, height = 3.5)
+}
+
+## WL - tide gauge
+l0_plot(water_level_m_navd88, qc_water_level)
+
+## Water temp
+l0_plot(temp_deg_c, qc_temp)
+
+## Salinity
+l0_plot(salinity_ppt, qc_salinity)
+
+## DO
+l0_plot(do_mg_l, qc_do)
+
+## Velocity
+l0_plot(max_velocity_m_s, maxu_qc)
+
+## Air temp
+l0_plot(airtemp_avg_deg_c, qc_airtemp_avg)
+
+## pH
+l0_plot(ph, qc_ph)
+
+## Chla
+l0_plot(chlorophyll_mg_l, qc_chlorophyll)
+
+## CDOM
+l0_plot(cdom_ppb, qc_cdom)
+
+## CO2
+l0_plot(p_co2_in_water_ppm, qc_pco2_water)
+
+## CO2
+l0_plot(p_co2_in_water_ppm, qc_pco2_water)
+
