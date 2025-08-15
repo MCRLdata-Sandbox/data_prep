@@ -104,8 +104,8 @@ df <- full_join(tidegauge %>% dplyr::select(-time_utc),
   full_join(co2 %>% dplyr::select(-time_utc), by = "time_pst") %>% 
   full_join(met %>% dplyr::select(-time_utc), by = "time_pst") 
 
-write_csv(df, "data/inputs/mcrl_data/MCRLdata_240501_250501_L0.csv")
-
+#write_csv(df, "data/inputs/mcrl_data/MCRLdata_240501_250501_L0.csv")
+write_csv(df, "data/inputs/mcrl_data/MCRLdata_240501_250720_L0.csv")
 
 ## Make L0 plots for parameters
 
@@ -154,6 +154,4 @@ l0_plot(cdom_ppb, qc_cdom)
 ## CO2
 l0_plot(p_co2_in_water_ppm, qc_pco2_water)
 
-## CO2
-l0_plot(p_co2_in_water_ppm, qc_pco2_water)
 

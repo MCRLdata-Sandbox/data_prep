@@ -30,7 +30,8 @@ assign_season <- function(data){
       mutate(season = case_when(month_num %in% c(3, 4, 5) ~ "1. Spring", 
                                 month_num %in% c(6, 7, 8) ~ "2. Summer", 
                                 month_num %in% c(9, 10, 11) ~ "3. Fall", 
-                                month_num %in% c(12, 1, 2) ~ "4. Winter"))
+                                month_num %in% c(12, 1, 2) ~ "4. Winter")) %>% 
+    mutate(doy = yday(time_pst))
 }
 
 

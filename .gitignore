@@ -57,3 +57,5 @@ data/mcrl_data/athena/*
 data/inputs/mcrl_data/MCRLdata*
 
 *s3_access*
+x_documenting_cli_access.docx
+x_claude_s3_to_r_prompt.docx
