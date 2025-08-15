@@ -212,7 +212,7 @@ ggplot(temp_final, aes(time_pst, temp_deg_c)) + geom_line()
 
 # 7. Bind data -----------------------------------------------------------------
 
-ctd_clean <- full_join(temp_clean %>% dplyr::select(time_pst, temp_deg_c), 
+ctd_clean <- full_join(temp_final %>% dplyr::select(time_pst, temp_deg_c), 
                        sal_despike %>% 
                          rename("salinity_psu_clean" = sal_ppt_despike) %>% 
                          dplyr::select(time_pst, salinity_psu_clean), 
@@ -221,7 +221,7 @@ ctd_clean <- full_join(temp_clean %>% dplyr::select(time_pst, temp_deg_c),
 
 # 8. Write out -----------------------------------------------------------------
 
-write_csv(ctd_clean, "data/outputs/L1/250630_ctd_water_temp_salinity_L1.csv")
+write_csv(ctd_clean, "data/outputs/L1/250815_ctd_water_temp_salinity_L1.csv")
 
 
 
