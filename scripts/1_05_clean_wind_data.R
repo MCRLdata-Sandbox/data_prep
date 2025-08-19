@@ -43,7 +43,9 @@ ggplot(wind_raw, aes(time_pst, windspeed_max_m_s)) +
 
 wind_final <- wind_raw %>% 
   dplyr::select(!contains("qc_")) %>% 
-  drop_na()
+  drop_na() %>% 
+  group_by(time_pst) %>% 
+  summarize(across(where(is.numeric), mean, .names = "{.col}"))
 
 write_csv(wind_final, "data/outputs/L1/250630_windspeed_L1.csv")
 
